@@ -475,16 +475,25 @@
     // 預設後端位址 (如果您已知道 API 位址，可以直接寫在這裡，例如 'https://api.yourdomain.com')
     let DEFAULT_BACKEND_ORIGIN = 'https://irl-svr.ee.yzu.edu.tw:5017';
 
-    // 解析網址參數
-    const urlParams = new URLSearchParams(window.location.search);
-    const oaId = urlParams.get('oaId') || urlParams.get('oa_id');
-    const surveyId = urlParams.get('surveyId') || urlParams.get('survey_key');
-    const botAppName = urlParams.get('botAppName') || urlParams.get('appName');
-    const defaultTagsParam = urlParams.get('defaultTags') || '';
+    // 解析網址參數 (支援 LINE 的 liff.state 機制)
+    let searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('liff.state')) {
+      const state = searchParams.get('liff.state');
+      const stateParams = new URLSearchParams(state.startsWith('?') ? state : '?' + state);
+      // 將 state 中的參數合併進去
+      for (const [key, value] of stateParams.entries()) {
+        searchParams.set(key, value);
+      }
+    }
+    
+    const oaId = searchParams.get('oaId') || searchParams.get('oa_id');
+    const surveyId = searchParams.get('surveyId') || searchParams.get('survey_key');
+    const botAppName = searchParams.get('botAppName') || searchParams.get('appName');
+    const defaultTagsParam = searchParams.get('defaultTags') || '';
 
     // 取得 API Origin 優先順序: URL 參數 > localStorage > 當前網頁網域
     const getBackendOrigin = () => {
-      const urlBackend = urlParams.get('backend') || urlParams.get('api');
+      const urlBackend = searchParams.get('backend') || searchParams.get('api');
       if (urlBackend) return urlBackend.replace(/\/+$/, '');
 
       const storedBackend = localStorage.getItem('superpages_backend_url');

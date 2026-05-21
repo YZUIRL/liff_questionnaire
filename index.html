@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LIFF 問卷</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  </head>
+  <body>
+    <main class="app">
+      <section id="loading" class="state">
+        <div class="spinner"></div>
+        <p>載入問卷中...</p>
+      </section>
+
+      <section id="error" class="state hidden">
+        <h1>無法開啟問卷</h1>
+        <p id="errorText"></p>
+      </section>
+
+      <form id="surveyForm" class="hidden">
+        <header class="header">
+          <p id="botName" class="eyebrow"></p>
+          <h1 id="surveyTitle"></h1>
+          <p id="surveyDescription"></p>
+          <div id="tagList" class="tags"></div>
+        </header>
+
+        <div id="questions"></div>
+
+        <button id="submitButton" type="submit">送出問卷</button>
+      </form>
+
+      <section id="done" class="state hidden">
+        <h1>已完成</h1>
+        <p id="finishMessage">感謝你的填寫</p>
+        <button id="closeButton" type="button">關閉</button>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

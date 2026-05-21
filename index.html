@@ -473,7 +473,7 @@
 
   <script>
     // 預設後端位址 (如果您已知道 API 位址，可以直接寫在這裡，例如 'https://api.yourdomain.com')
-    let DEFAULT_BACKEND_ORIGIN = '';
+    let DEFAULT_BACKEND_ORIGIN = 'https://irl-svr.ee.yzu.edu.tw:5017';
 
     // 解析網址參數
     const urlParams = new URLSearchParams(window.location.search);
@@ -545,13 +545,9 @@
 
     // 初始化 LIFF
     async function initializeLiff() {
+      const liffId = '2009851813-AgTeSa4r'; // 統一使用預設的 LIFF ID
       try {
-        // 先嘗試發起輕量請求取得 liffId，若後端問卷資料裡已儲存 liffId 可直接初始化，或者使用一般預設的 liffId
-        const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
-        surveyData = res.data.survey;
-
-        const liffId = '2009851813-AgTeSa4r'; // 統一使用預設的 LIFF ID
-
+        // 第一步：優先初始化 LIFF，避免 LINE App 逾時自動關閉視窗
         await liff.init({ liffId: liffId });
 
         if (liff.isLoggedIn()) {
@@ -564,21 +560,30 @@
           }
         }
       } catch (e) {
-        console.warn('LIFF init failed or fallback to browser mode:', e);
-        // 如果 init 失敗，我們可以使用模擬資料繼續（方便測試環境）
-        liffProfile = {
-          userId: 'U' + Math.random().toString(36).substring(2, 15),
-          displayName: '模擬測試用戶',
-          pictureUrl: ''
-        };
+        console.warn('LIFF init failed:', e);
+        // 如果是在一般瀏覽器中（非 LINE Client）且初始化失敗，提供模擬資料供測試
+        if (!liff.isInClient || !liff.isInClient()) {
+          liffProfile = {
+            userId: 'U' + Math.random().toString(36).substring(2, 15),
+            displayName: '模擬測試用戶',
+            pictureUrl: ''
+          };
+        } else {
+          // 如果在 LINE App 內初始化失敗，向上拋出錯誤以利顯示錯誤畫面
+          throw new Error('LINE LIFF 初始化失敗: ' + (e.message || e.toString()));
+        }
       }
     }
 
-    // 重新拉取詳情 (防禦以防 initializeLiff 快取不一致)
+    // 重新拉取詳情
     async function fetchSurveyDetail() {
-      if (surveyData) return;
-      const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
-      surveyData = res.data.survey;
+      try {
+        const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
+        surveyData = res.data.survey;
+      } catch (err) {
+        console.error('Fetch survey detail failed:', err);
+        throw new Error('無法取得問卷資料，請確認後端伺服器運作正常且網路連線無礙。' + (err.response?.data?.error ? ' (' + err.response.data.error + ')' : ''));
+      }
     }
 
     // 顯示錯誤畫面

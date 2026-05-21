@@ -647,6 +647,9 @@
         if (q.answer_type === 'text') {
           html += `<input type="text" class="input-text" data-qid="${qId}" data-required="${isRequired}" placeholder="請輸入您的回答...">`;
         }
+        else if (q.answer_type === 'number') {
+          html += `<input type="number" class="input-text" data-qid="${qId}" data-required="${isRequired}" placeholder="請輸入數字...">`;
+        }
         else if (q.answer_type === 'phone') {
           html += `<input type="tel" class="input-text" data-qid="${qId}" data-required="${isRequired}" data-validation="phone" placeholder="例如: 0912345678">`;
         }
@@ -656,7 +659,7 @@
         else if (q.answer_type === 'date') {
           html += `<input type="date" class="input-date" data-qid="${qId}" data-required="${isRequired}">`;
         }
-        else if (q.answer_type === 'select') {
+        else if (q.answer_type === 'single_choice') {
           // 單選題
           const options = parseOptions(q.options);
           html += `<div class="option-group">`;
@@ -670,7 +673,7 @@
           });
           html += `</div>`;
         }
-        else if (q.answer_type === 'multi') {
+        else if (q.answer_type === 'multiple_choice') {
           // 複選題
           const options = parseOptions(q.options);
           html += `<div class="option-group">`;
@@ -737,11 +740,11 @@
         let value = '';
 
         // 抓取值
-        if (q.answer_type === 'select') {
+        if (q.answer_type === 'single_choice') {
           const selected = document.querySelector(`input[name="q-${qId}"]:checked`);
           value = selected ? selected.value : '';
         }
-        else if (q.answer_type === 'multi') {
+        else if (q.answer_type === 'multiple_choice') {
           const selected = Array.from(document.querySelectorAll(`input[name="q-${qId}"]:checked`)).map(el => el.value);
           value = selected.join(',');
         }

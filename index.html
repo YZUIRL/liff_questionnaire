@@ -548,7 +548,15 @@
         renderSurvey();
       } catch (err) {
         console.error(err);
-        showErrorScreen('載入問卷失敗', err.message || '無法自後端伺服器取得問卷，請確認網路連線或 API 設定。');
+        const errMsg = err.message || '';
+        if (errMsg.includes('尚未開始') || errMsg.includes('已結束') || errMsg.includes('尚未開放')) {
+          let title = '問卷尚未開放';
+          if (errMsg.includes('尚未開始')) title = '問卷尚未開始';
+          if (errMsg.includes('已結束')) title = '問卷已結束';
+          showFriendlyScreen(title, '非常抱歉，此問卷目前不在開放填寫的時間範圍內。', '⏳');
+        } else {
+          showErrorScreen('載入問卷失敗', errMsg || '無法自後端伺服器取得問卷，請確認網路連線或 API 設定。');
+        }
       }
     };
 
@@ -600,6 +608,17 @@
       document.getElementById('app-content').innerHTML = `
         <div class="card state-screen">
           <div class="state-icon" style="color: var(--error-color)">❌</div>
+          <div class="state-title">${title}</div>
+          <div class="state-desc">${desc}</div>
+        </div>
+      `;
+    }
+
+    // 顯示友善狀態畫面
+    function showFriendlyScreen(title, desc, icon = '⏳') {
+      document.getElementById('app-content').innerHTML = `
+        <div class="card state-screen">
+          <div class="state-icon" style="color: var(--primary-yellow)">${icon}</div>
           <div class="state-title">${title}</div>
           <div class="state-desc">${desc}</div>
         </div>

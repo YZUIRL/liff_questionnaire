@@ -764,8 +764,7 @@
           value = selected ? selected.value : '';
         }
         else if (q.answer_type === 'multiple_choice') {
-          const selected = Array.from(document.querySelectorAll(`input[name="q-${qId}"]:checked`)).map(el => el.value);
-          value = selected.join(',');
+          value = Array.from(document.querySelectorAll(`input[name="q-${qId}"]:checked`)).map(el => el.value);
         }
         else {
           const inputEl = document.querySelector(`[data-qid="${qId}"]`);
@@ -773,7 +772,7 @@
         }
 
         // 驗證必填
-        if (q.required && !value) {
+        if (q.required && (!value || (Array.isArray(value) && value.length === 0))) {
           hasError = true;
           qCard.classList.add('has-error');
           errorEl.innerText = '此欄位為必填項目';

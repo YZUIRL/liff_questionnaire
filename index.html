@@ -599,6 +599,15 @@
         const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
         surveyData = res.data.survey;
         
+        if (surveyData.bg_image) {
+          document.body.style.backgroundImage = `url('${surveyData.bg_image}')`;
+          document.body.style.backgroundSize = 'cover';
+          document.body.style.backgroundPosition = 'center';
+          document.body.style.backgroundAttachment = 'fixed';
+        } else {
+          document.body.style.backgroundImage = '';
+        }
+
         if (surveyData.theme_color) {
           const color = surveyData.theme_color;
           if (/^#[0-9a-fA-F]{6}$/.test(color)) {

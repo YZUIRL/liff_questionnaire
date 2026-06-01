@@ -598,6 +598,10 @@
       try {
         const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
         surveyData = res.data.survey;
+        
+        if (surveyData.theme_color) {
+          document.documentElement.style.setProperty('--primary-yellow', surveyData.theme_color);
+        }
       } catch (err) {
         console.error('Fetch survey detail failed:', err);
         throw new Error('無法取得問卷資料，請確認後端伺服器運作正常且網路連線無礙。' + (err.response?.data?.error ? ' (' + err.response.data.error + ')' : ''));

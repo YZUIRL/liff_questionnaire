@@ -900,7 +900,29 @@
         console.error(err);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `提交問卷`;
-        alert(err.response?.data?.error || '問卷提交失敗，請稍後再試。');
+        const resData = err.response?.data;
+        if (resData && resData.fields && Object.keys(resData.fields).length > 0) {
+          const errList = [];
+          Object.entries(resData.fields).forEach(([qid, reason]) => {
+            const q = questions.find(item => String(item.id) === String(qid) || String(item.question_no) === String(qid));
+            const title = q ? `第 ${q.question_no} 題 (${q.content})` : `題目 ${qid}`;
+            errList.push(`${title}: ${reason}`);
+            const qCard = document.getElementById(`q-card-${qid}`);
+            const errorEl = document.getElementById(`error-${qid}`);
+            if (qCard) qCard.classList.add('has-error');
+            if (errorEl) {
+              errorEl.innerText = reason;
+              errorEl.style.display = 'block';
+            }
+          });
+          const firstErrCard = document.querySelector('.question-card.has-error');
+          if (firstErrCard) {
+            firstErrCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          alert(`答案格式不正確：\n${errList.join('\n')}`);
+        } else {
+          alert(resData?.error || '問卷提交失敗，請稍後再試。');
+        }
       }
     }
   </script>

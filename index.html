@@ -94,6 +94,11 @@
       margin-bottom: 24px;
       display: flex;
       flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .question-label {
@@ -303,6 +308,123 @@
     }
 
     .time-selected-display .highlight {
+      color: var(--primary-yellow);
+      font-weight: 700;
+    }
+
+    /* Date Picker UI (防溢出、深色原生適配與快捷操作) */
+    .date-picker-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .date-input-container {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .input-date {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      display: block;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      outline: none;
+      padding: 13px 16px;
+      border-radius: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color-scheme: dark; /* 強制原生日期選取器為深色模式，根除白色背景與溢出 */
+      -webkit-appearance: none;
+      appearance: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .input-date:focus {
+      border-color: var(--primary-yellow);
+      box-shadow: 0 0 0 3px var(--input-focus);
+    }
+
+    .input-date::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+      opacity: 0.85;
+      padding: 4px;
+      margin-left: 8px;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .input-date::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .input-date::-webkit-date-and-time-value {
+      text-align: left;
+      min-height: 1.5em;
+      color: var(--text-main);
+    }
+
+    .input-date::-webkit-datetime-edit,
+    .input-date::-webkit-datetime-edit-fields-wrapper,
+    .input-date::-webkit-datetime-edit-text,
+    .input-date::-webkit-datetime-edit-month-field,
+    .input-date::-webkit-datetime-edit-day-field,
+    .input-date::-webkit-datetime-edit-year-field {
+      color: var(--text-main);
+      background: transparent;
+    }
+
+    .date-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .btn-date-shortcut {
+      background: rgba(255, 213, 79, 0.12);
+      border: 1px solid rgba(255, 213, 79, 0.35);
+      color: var(--primary-yellow);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-date-shortcut:active {
+      transform: scale(0.96);
+      background: rgba(255, 213, 79, 0.25);
+    }
+
+    .date-selected-display {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .date-selected-display .highlight {
       color: var(--primary-yellow);
       font-weight: 700;
     }
@@ -833,7 +955,21 @@
           html += `<input type="email" class="input-text" data-qid="${qId}" data-required="${isRequired}" data-validation="email" placeholder="例如: name@example.com">`;
         }
         else if (q.answer_type === 'date') {
-          html += `<input type="date" class="input-date" data-qid="${qId}" data-required="${isRequired}">`;
+          html += `
+            <div class="date-picker-wrapper" id="date-wrapper-${qId}">
+              <div class="date-input-container">
+                <input type="date" class="input-date" id="date-input-${qId}" data-qid="${qId}" data-required="${isRequired}" onchange="updateDatePicker('${qId}')">
+              </div>
+              <div class="date-actions-row">
+                <button type="button" class="btn-date-shortcut" onclick="fillTodayDate('${qId}')">
+                  📅 填入今天日期
+                </button>
+                <div class="date-selected-display" id="date-display-${qId}">
+                  尚未選取日期
+                </div>
+              </div>
+            </div>
+          `;
         }
         else if (q.answer_type === 'time') {
           // 生成小時選項 (00 ~ 23)
@@ -957,6 +1093,41 @@
       if (hSelect) hSelect.value = currentH;
       if (mSelect) mSelect.value = currentM;
       updateTimePicker(qId);
+    }
+
+    // 更新日期預覽反饋
+    function updateDatePicker(qId) {
+      const input = document.getElementById(`date-input-${qId}`);
+      const display = document.getElementById(`date-display-${qId}`);
+      if (!input || !display) return;
+      const val = (input.value || '').trim();
+      if (val) {
+        try {
+          const parts = val.split('-');
+          if (parts.length === 3) {
+            const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+            const dayName = days[d.getDay()] || '';
+            display.innerHTML = `已選取：<span class="highlight">${val} ${dayName}</span>`;
+            return;
+          }
+        } catch (e) {}
+        display.innerHTML = `已選取：<span class="highlight">${val}</span>`;
+      } else {
+        display.innerHTML = '尚未選取日期';
+      }
+    }
+
+    // 快捷填入今天日期
+    function fillTodayDate(qId) {
+      const input = document.getElementById(`date-input-${qId}`);
+      if (!input) return;
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      input.value = `${y}-${m}-${d}`;
+      updateDatePicker(qId);
     }
 
     // 解析選項

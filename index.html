@@ -202,8 +202,109 @@
       display: flex;
     }
 
-    .question-card.has-error .input-text {
+    .question-card.has-error .input-text,
+    .question-card.has-error .time-select {
       border-color: var(--error-color);
+    }
+
+    /* Time Picker UI (手機友善雙選單滾輪與快捷操作) */
+    .time-picker-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .time-select-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .time-select-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .time-select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      outline: none;
+      padding: 14px 16px;
+      border-radius: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23aaa5c0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 14px;
+      transition: all 0.25s ease;
+    }
+
+    .time-select:focus {
+      border-color: var(--primary-yellow);
+      box-shadow: 0 0 0 3px var(--input-focus);
+    }
+
+    .time-select option {
+      background: #181330;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .time-separator {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-yellow);
+      user-select: none;
+      margin: 0 2px;
+    }
+
+    .time-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-time-shortcut {
+      background: rgba(255, 213, 79, 0.12);
+      border: 1px solid rgba(255, 213, 79, 0.35);
+      color: var(--primary-yellow);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-time-shortcut:active {
+      transform: scale(0.96);
+      background: rgba(255, 213, 79, 0.25);
+    }
+
+    .time-selected-display {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .time-selected-display .highlight {
+      color: var(--primary-yellow);
+      font-weight: 700;
     }
 
     /* Submit Button */
@@ -735,7 +836,45 @@
           html += `<input type="date" class="input-date" data-qid="${qId}" data-required="${isRequired}">`;
         }
         else if (q.answer_type === 'time') {
-          html += `<input type="time" class="input-date input-time" data-qid="${qId}" data-required="${isRequired}">`;
+          // 生成小時選項 (00 ~ 23)
+          let hourOptions = '<option value="">時 (小時)</option>';
+          for (let h = 0; h < 24; h++) {
+            const hStr = String(h).padStart(2, '0');
+            hourOptions += `<option value="${hStr}">${hStr} 時</option>`;
+          }
+          // 生成分鐘選項 (00 ~ 59)
+          let minOptions = '<option value="">分 (分鐘)</option>';
+          for (let m = 0; m < 60; m++) {
+            const mStr = String(m).padStart(2, '0');
+            minOptions += `<option value="${mStr}">${mStr} 分</option>`;
+          }
+
+          html += `
+            <div class="time-picker-wrapper" id="time-wrapper-${qId}">
+              <div class="time-select-group">
+                <div class="time-select-box">
+                  <select class="time-select" id="time-h-${qId}" onchange="updateTimePicker('${qId}')">
+                    ${hourOptions}
+                  </select>
+                </div>
+                <span class="time-separator">:</span>
+                <div class="time-select-box">
+                  <select class="time-select" id="time-m-${qId}" onchange="updateTimePicker('${qId}')">
+                    ${minOptions}
+                  </select>
+                </div>
+              </div>
+              <div class="time-actions-row">
+                <button type="button" class="btn-time-shortcut" onclick="setTimeToNow('${qId}')">
+                  ⏱️ 填入現在時間
+                </button>
+                <span class="time-selected-display" id="time-disp-${qId}">
+                  尚未選取
+                </span>
+              </div>
+              <input type="hidden" class="input-time-value" data-qid="${qId}" data-required="${isRequired}" value="">
+            </div>
+          `;
         }
         else if (q.answer_type === 'single_choice') {
           // 單選題
@@ -779,6 +918,45 @@
       `;
 
       document.getElementById('app-content').innerHTML = html;
+    }
+
+    // 更新時間選擇器數值
+    function updateTimePicker(qId) {
+      const hSelect = document.getElementById(`time-h-${qId}`);
+      const mSelect = document.getElementById(`time-m-${qId}`);
+      const hiddenInput = document.querySelector(`input[data-qid="${qId}"]`);
+      const dispEl = document.getElementById(`time-disp-${qId}`);
+      
+      const hVal = hSelect ? hSelect.value : '';
+      const mVal = mSelect ? mSelect.value : '';
+      
+      if (hVal && mVal) {
+        const timeStr = `${hVal}:${mVal}`;
+        if (hiddenInput) hiddenInput.value = timeStr;
+        if (dispEl) dispEl.innerHTML = `已選時間：<span class="highlight">${timeStr}</span>`;
+        const card = document.getElementById(`q-card-${qId}`);
+        if (card) card.classList.remove('has-error');
+      } else if (hVal || mVal) {
+        if (hiddenInput) hiddenInput.value = '';
+        if (dispEl) dispEl.innerText = '請完整選取小時與分鐘';
+      } else {
+        if (hiddenInput) hiddenInput.value = '';
+        if (dispEl) dispEl.innerText = '尚未選取';
+      }
+    }
+
+    // 快捷鍵：填入當前時間
+    function setTimeToNow(qId) {
+      const now = new Date();
+      const currentH = String(now.getHours()).padStart(2, '0');
+      const currentM = String(now.getMinutes()).padStart(2, '0');
+      
+      const hSelect = document.getElementById(`time-h-${qId}`);
+      const mSelect = document.getElementById(`time-m-${qId}`);
+      
+      if (hSelect) hSelect.value = currentH;
+      if (mSelect) mSelect.value = currentM;
+      updateTimePicker(qId);
     }
 
     // 解析選項
@@ -868,7 +1046,7 @@
             if (!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(value)) {
               hasError = true;
               qCard.classList.add('has-error');
-              errorEl.innerText = '時間格式不正確 (HH:MM)';
+              errorEl.innerText = '請完整選取時間 (小時與分鐘)';
               return;
             }
           }

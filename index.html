@@ -113,7 +113,8 @@
     /* Input elements */
     .input-text,
     .input-select,
-    .input-date {
+    .input-date,
+    .input-time {
       width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--input-border);
@@ -126,9 +127,16 @@
       transition: all 0.25s ease;
     }
 
+    textarea.input-text {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
     .input-text:focus,
     .input-select:focus,
-    .input-date:focus {
+    .input-date:focus,
+    .input-time:focus {
       border-color: var(--primary-yellow);
       box-shadow: 0 0 0 3px var(--input-focus);
     }
@@ -712,7 +720,7 @@
 
         // 依據 answer_type 渲染不同控制項
         if (q.answer_type === 'text') {
-          html += `<input type="text" class="input-text" data-qid="${qId}" data-required="${isRequired}" placeholder="請輸入您的回答...">`;
+          html += `<textarea class="input-text" rows="3" data-qid="${qId}" data-required="${isRequired}" placeholder="請輸入您的回答..."></textarea>`;
         }
         else if (q.answer_type === 'number') {
           html += `<input type="number" class="input-text" data-qid="${qId}" data-required="${isRequired}" placeholder="請輸入數字...">`;
@@ -725,6 +733,9 @@
         }
         else if (q.answer_type === 'date') {
           html += `<input type="date" class="input-date" data-qid="${qId}" data-required="${isRequired}">`;
+        }
+        else if (q.answer_type === 'time') {
+          html += `<input type="time" class="input-date input-time" data-qid="${qId}" data-required="${isRequired}">`;
         }
         else if (q.answer_type === 'single_choice') {
           // 單選題
@@ -850,6 +861,14 @@
               hasError = true;
               qCard.classList.add('has-error');
               errorEl.innerText = '日期格式不正確 (YYYY-MM-DD)';
+              return;
+            }
+          }
+          if (q.answer_type === 'time') {
+            if (!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(value)) {
+              hasError = true;
+              qCard.classList.add('has-error');
+              errorEl.innerText = '時間格式不正確 (HH:MM)';
               return;
             }
           }

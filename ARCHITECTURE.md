@@ -33,3 +33,7 @@
   - **日期與時間快捷列**：保留「填入今天日期」與「填入現在時間」快捷按鈕，改為極簡淺灰小按鈕樣式（`#F3F4F6` 底、`#E5E7EB` 框、`12.5px`）。
   - **Radio / Checkbox**：移除大型半透明選項框，改為左靠齊圓形 Radio / 方形 Checkbox 清單，選取識別色統一為 `#06C755`。
   - **主要操作按鈕 (`.btn-submit`)**：固定為 LINE 綠色 `#06C755`、白字 `#FFFFFF`、圓角 `8px`、高度 `48px`、字重 `600`，搭配底部 Sticky 區塊與 `env(safe-area-inset-bottom)` 手機安全區域內距。
+
+
+## [2026-11-03] 拆分「文字 (`text`)」與「多行文字 (`textarea`)」答案類型
+- `renderSurvey()` 針對 `answer_type === 'text'` 渲染單行 `<input type="text" class="input-text">`（不可換行、高度 `46px`）；針對 `answer_type === 'textarea'` 渲染多行 `<textarea class="input-text" rows="3">`（可換行、最小高度 `92px`）。

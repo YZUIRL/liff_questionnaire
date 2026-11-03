@@ -25,3 +25,11 @@
   - 保留「填入今天日期」與「填入現在時間」快捷按鈕並調整為極簡淺灰小按鈕。
   - 底部提交按鈕改為 LINE 綠色 `#06C755`（高度 `48px`、圓角 `8px`），支援 Sticky 底欄與 `safe-area-inset-bottom`。
   - 完整保留背景底圖（`bg_image`）與外圍主題底色（`theme_color`）設定能力及所有既有驗證與提交流程。
+
+
+## [2026-11-03] - 拆分「文字 (`text`)」與「多行文字 (`textarea`)」答案類型
+
+### 新增與修改 (Added & Changed)
+- **單行文字與多行文字分離渲染** (`index.html`)：
+  - `answer_type === 'text'` 改為渲染一般不可換行的單行輸入框 `<input type="text" class="input-text">`。
+  - 新增 `answer_type === 'textarea'`（「多行文字」），渲染可換行的多行文字框 `<textarea class="input-text" rows="3">`。

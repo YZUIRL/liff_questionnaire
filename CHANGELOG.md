@@ -33,3 +33,10 @@
 - **單行文字與多行文字分離渲染** (`index.html`)：
   - `answer_type === 'text'` 改為渲染一般不可換行的單行輸入框 `<input type="text" class="input-text">`。
   - 新增 `answer_type === 'textarea'`（「多行文字」），渲染可換行的多行文字框 `<textarea class="input-text" rows="3">`。
+
+## [2026-11-03] - 移除內部除錯用「API 與環境設定」按鈕與彈窗
+
+### 移除 (Removed)
+- **移除前端開發設定介面** (`index.html`)：
+  - 徹底移除右上角的除錯齒輪圖示（`⚙️`）、環境設定彈出視窗（`#config-modal`）以及背景遮罩（`#config-overlay`）。
+  - 移除 `toggleConfig` 與 `saveConfig` 函式，防止使用者填答時看到或更動後端 API 伺服器網域與內部設定。

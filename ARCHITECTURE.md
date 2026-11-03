@@ -37,3 +37,7 @@
 
 ## [2026-11-03] 拆分「文字 (`text`)」與「多行文字 (`textarea`)」答案類型
 - `renderSurvey()` 針對 `answer_type === 'text'` 渲染單行 `<input type="text" class="input-text">`（不可換行、高度 `46px`）；針對 `answer_type === 'textarea'` 渲染多行 `<textarea class="input-text" rows="3">`（可換行、最小高度 `92px`）。
+
+## [2026-11-03] 移除內部除錯用「API 與環境設定」齒輪按鈕與彈窗
+- 徹底移除右上角除錯齒輪圖示 (`.config-trigger`)、設定彈窗 (`.config-modal`、`#config-overlay`) 與相關 JS 函式 (`toggleConfig`, `saveConfig`)。
+- 確保一般使用者在 LINE LIFF 開啟問卷時不會看到或點擊到開發者除錯視窗，API Origin 一律由 URL 參數 (`backend`)、預設伺服器網址自動解析。

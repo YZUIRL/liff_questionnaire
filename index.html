@@ -529,115 +529,6 @@
       line-height: 1.6;
     }
 
-    /* Config Panel Trigger (Subtle Cog Icon) */
-    .config-trigger {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      background: transparent;
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      opacity: 0.18;
-      transition: opacity 0.2s ease, background-color 0.2s ease;
-      color: var(--text-main);
-      font-size: 14px;
-      z-index: 20;
-    }
-
-    .config-trigger:hover {
-      opacity: 0.85;
-      background: #F3F4F6;
-    }
-
-    /* Config Modal */
-    .config-modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #FFFFFF;
-      border: 1px solid var(--divider-color);
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
-      z-index: 1000;
-    }
-
-    .config-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 999;
-    }
-
-    .config-modal h3 {
-      margin-bottom: 14px;
-      font-size: 1rem;
-      color: var(--text-main);
-    }
-
-    .config-modal label {
-      display: block;
-      font-size: 13px;
-      color: var(--text-label);
-      margin-bottom: 6px;
-    }
-
-    .config-modal input {
-      width: 100%;
-      height: 44px;
-      padding: 10px 12px;
-      background: #FFFFFF;
-      border: 1px solid var(--input-border);
-      border-radius: 8px;
-      color: var(--text-main);
-      font-size: 15px;
-      margin-bottom: 16px;
-      outline: none;
-    }
-
-    .config-modal input:focus {
-      border-color: var(--primary-green);
-    }
-
-    .config-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    .config-btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .config-btn-save {
-      background: var(--primary-green);
-      color: #FFFFFF;
-    }
-
-    .config-btn-close {
-      background: #F3F4F6;
-      color: #4B5563;
-    }
-
     /* Skeleton Loading */
     .skeleton-wrap {
       padding: 20px;
@@ -680,9 +571,6 @@
 
   <div class="container">
 
-    <!-- Config Trigger -->
-    <div class="config-trigger" onclick="toggleConfig(true)">⚙️</div>
-
     <!-- Main Content Area -->
     <div id="app-content">
 
@@ -699,18 +587,6 @@
 
     </div>
 
-  </div>
-
-  <!-- Config Panel -->
-  <div class="config-overlay" id="config-overlay" onclick="toggleConfig(false)"></div>
-  <div class="config-modal" id="config-modal">
-    <h3>⚙️ API 與環境設定</h3>
-    <label for="config-backend">後端 API 伺服器網域</label>
-    <input type="text" id="config-backend" placeholder="例如: https://your-backend.herokuapp.com">
-    <div class="config-actions">
-      <button class="config-btn config-btn-close" onclick="toggleConfig(false)">關閉</button>
-      <button class="config-btn config-btn-save" onclick="saveConfig()">儲存設定</button>
-    </div>
   </div>
 
   <script>
@@ -748,29 +624,11 @@
     };
 
     let backendOrigin = getBackendOrigin();
-    document.getElementById('config-backend').value = backendOrigin;
 
     // 狀態設定
     let liffProfile = null;
     let liffIdToken = null;
     let surveyData = null;
-
-    // 開關設定視窗
-    function toggleConfig(show) {
-      document.getElementById('config-overlay').style.display = show ? 'block' : 'none';
-      document.getElementById('config-modal').style.display = show ? 'block' : 'none';
-    }
-
-    // 儲存設定
-    function saveConfig() {
-      const val = document.getElementById('config-backend').value.trim().replace(/\/+$/, '');
-      if (val) {
-        localStorage.setItem('superpages_backend_url', val);
-        backendOrigin = val;
-        toggleConfig(false);
-        alert('設定已儲存，網頁將自動重新載入。');
-      }
-    }
 
     // 檢測是否為電腦版環境 (桌面電腦/PC 瀏覽器，非手機 LINE)
     function isDesktopBrowser() {

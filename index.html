@@ -722,6 +722,7 @@
     const surveyId = searchParams.get('surveyId') || searchParams.get('survey_key');
     const botAppName = searchParams.get('botAppName') || searchParams.get('appName');
     const defaultTagsParam = searchParams.get('defaultTags') || '';
+    const groupId = searchParams.get('groupId') || searchParams.get('group_id') || '';
 
     // 取得 API Origin 優先順序: URL 參數 > localStorage > 當前網頁網域
     const getBackendOrigin = () => {
@@ -1316,7 +1317,8 @@
         profile: liffProfile,
         answers: answersList,
         default_tags: defaultTagsParam ? defaultTagsParam.split(',') : [],
-        bot_app_name: botAppName
+        bot_app_name: botAppName,
+        group_id: groupId
       };
 
       try {
@@ -1324,7 +1326,7 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<div class="spinner"></div> 提交中...`;
 
-        const res = await axios.post(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}/responses?oaId=${oaId}`, payload);
+        const res = await axios.post(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}/responses?oaId=${oaId}${groupId ? '&groupId=' + encodeURIComponent(groupId) : ''}`, payload);
 
         // 顯示成功頁面
         showSuccessScreen(res.data.finish_message || '感謝您的填寫！');

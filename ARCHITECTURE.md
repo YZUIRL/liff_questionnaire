@@ -14,3 +14,8 @@
    - 支援文字 (`text`)、數字 (`number`)、單選 (`single_choice`)、多選 (`multiple_choice`)、手機 (`phone`)、Email (`email`)、日期 (`date`)、時間 (`time`) 等 8 種題型與行動端友善 UI。
 5. **問卷提交與群組 `groupId` 透傳 (`submitForm`)**：
    - 將作答內容、LINE 身分憑證與 `group_id` 透過 `POST /api/liff-questionnaires/public/<surveyId>/responses` 提交至 Superpages 後端，觸發標籤標註、自動旅程、圖文選單切換及 WebSocket `Sensor` 群組/個人推播事件。
+
+
+
+## [2026-11-03] 動態群組參數 `<%m.groupid%>` 合法性過濾
+- 於 `index.html` 解析 `groupId` 時加入 `/^[CR][0-9a-fA-F]{10,}$/` 格式驗證，當網址由個人對話觸發（`groupId=None`）或未經機器人替換（`groupId=<%m.groupid%>`）時自動轉為空字串 `''`，確保同一條問卷連結可跨群組與個人對話通用。

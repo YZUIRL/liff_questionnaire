@@ -722,7 +722,8 @@
     const surveyId = searchParams.get('surveyId') || searchParams.get('survey_key');
     const botAppName = searchParams.get('botAppName') || searchParams.get('appName');
     const defaultTagsParam = searchParams.get('defaultTags') || '';
-    const groupId = searchParams.get('groupId') || searchParams.get('group_id') || '';
+    const rawGroupId = (searchParams.get('groupId') || searchParams.get('group_id') || '').trim();
+    const groupId = /^[CR][0-9a-fA-F]{10,}$/.test(rawGroupId) ? rawGroupId : '';
 
     // 取得 API Origin 優先順序: URL 參數 > localStorage > 當前網頁網域
     const getBackendOrigin = () => {

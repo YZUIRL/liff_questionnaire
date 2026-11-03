@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>LIFF 問卷調查</title>
-  <!-- Google Fonts Outfit & Noto Sans TC -->
+  <!-- Google Fonts Noto Sans TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <!-- Axios for API requests -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -19,121 +19,168 @@
 
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #15102a 50%, #06040a 100%);
-      --card-bg: rgba(25, 20, 45, 0.45);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --primary-yellow: #ffd54f;
-      --primary-hover: #ffca28;
-      --text-main: #f3f0ff;
-      --text-muted: #aaa5c0;
-      --error-color: #ff5252;
-      --success-color: #69f0ae;
-      --input-bg: rgba(0, 0, 0, 0.3);
-      --input-border: rgba(255, 255, 255, 0.12);
-      --input-focus: rgba(255, 213, 79, 0.5);
+      --page-bg: #ffffff;
+      --form-surface: #ffffff;
+      --primary-green: #06C755;
+      --primary-green-hover: #05b34c;
+      --primary-green-focus: rgba(6, 199, 85, 0.14);
+      --text-main: #1F2937;
+      --text-label: #8291A5;
+      --text-muted: #6B7280;
+      --placeholder-color: #9CA3AF;
+      --input-bg: #FFFFFF;
+      --input-border: #D9DEE5;
+      --divider-color: #E5E7EB;
+      --error-color: #EF4444;
+      --success-color: #06C755;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     body {
-      font-family: 'Outfit', 'Noto Sans TC', sans-serif;
-      background: var(--bg-gradient);
+      font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--page-bg);
       color: var(--text-main);
-      min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 20px 15px;
+      align-items: stretch;
+      padding: 0;
       overflow-y: auto;
+    }
+
+    /* 當有自訂背景圖片或非白色外圍底色時，給予適當內距以呈現背景 */
+    body.has-custom-bg {
+      padding: 16px 12px;
+      align-items: flex-start;
     }
 
     /* Container */
     .container {
       width: 100%;
-      max-width: 600px;
-      margin-top: 10px;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--form-surface);
+      display: flex;
+      flex-direction: column;
       position: relative;
     }
 
-    /* Glassmorphism Card */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 30px 25px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-      margin-bottom: 25px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    body.has-custom-bg .container {
+      min-height: auto;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(217, 222, 229, 0.85);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
     }
 
-    /* Header */
+    #app-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* Minimal Clean Header */
+    .survey-header {
+      background: transparent;
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--divider-color);
+      text-align: center;
+    }
+
     .survey-header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #fff;
-      line-height: 1.3;
-      letter-spacing: 0.5px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+      letter-spacing: 0.2px;
+      word-break: break-word;
     }
 
     .survey-header p {
+      margin-top: 6px;
       color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
+      font-size: 0.85rem;
+      line-height: 1.5;
       white-space: pre-wrap;
+      text-align: left;
     }
 
-    /* Question Container */
+    /* Form Body */
+    #survey-form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .questions-list {
+      padding: 20px 20px 12px;
+      width: 100%;
+    }
+
+    /* Question Field (Flat, no individual decorative card) */
     .question-card {
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       display: flex;
       flex-direction: column;
       width: 100%;
       max-width: 100%;
       min-width: 0;
-      box-sizing: border-box;
-      overflow: hidden;
     }
 
     .question-label {
-      font-size: 1.05rem;
+      font-size: 13.5px;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin-bottom: 7px;
       line-height: 1.4;
-      color: var(--text-main);
+      color: var(--text-label);
+      word-break: break-word;
     }
 
     .required-star {
       color: var(--error-color);
-      margin-left: 4px;
-      font-weight: bold;
+      margin-left: 3px;
+      font-weight: 600;
     }
 
-    /* Input elements */
+    /* Unified Form Controls */
     .input-text,
     .input-select,
     .input-date,
     .input-time {
       width: 100%;
+      max-width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--input-border);
       outline: none;
-      padding: 12px 16px;
-      border-radius: 12px;
+      height: 46px;
+      padding: 11px 14px;
+      border-radius: 8px;
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.95rem;
-      transition: all 0.25s ease;
+      font-size: 16px;
+      line-height: 1.4;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     textarea.input-text {
-      min-height: 80px;
+      height: auto;
+      min-height: 92px;
+      padding: 12px 14px;
       resize: vertical;
       line-height: 1.5;
     }
@@ -141,66 +188,75 @@
     .input-text:focus,
     .input-select:focus,
     .input-date:focus,
-    .input-time:focus {
-      border-color: var(--primary-yellow);
-      box-shadow: 0 0 0 3px var(--input-focus);
+    .input-time:focus,
+    .time-select:focus {
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px var(--primary-green-focus);
     }
 
     .input-text::placeholder {
-      color: #66617a;
+      color: var(--placeholder-color);
     }
 
-    /* Checkbox & Radio */
+    .input-text:disabled,
+    .input-select:disabled,
+    .input-date:disabled,
+    .time-select:disabled {
+      background: #F3F4F6;
+      color: #9CA3AF;
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    /* Radio & Checkbox (Minimal Clean List) */
     .option-group {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 5px;
+      gap: 6px;
+      margin-top: 2px;
     }
 
     .option-item {
       display: flex;
       align-items: center;
-      position: relative;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 12px 16px;
-      border-radius: 12px;
-      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      padding: 6px 2px;
+      border-radius: 6px;
+      min-height: 36px;
+      transition: background-color 0.15s ease;
     }
 
     .option-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.03);
     }
 
     .option-item input {
-      margin-right: 12px;
-      accent-color: var(--primary-yellow);
+      margin-right: 10px;
+      accent-color: var(--primary-green);
       width: 18px;
       height: 18px;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .option-text {
-      font-size: 0.95rem;
+      font-size: 15px;
       color: var(--text-main);
+      line-height: 1.4;
       user-select: none;
+      word-break: break-word;
     }
 
-    /* Error Text */
+    /* Validation Error Text */
     .error-msg {
       color: var(--error-color);
-      font-size: 0.85rem;
-      margin-top: 6px;
+      font-size: 12.5px;
+      margin-top: 5px;
       display: none;
       align-items: center;
       gap: 4px;
-    }
-
-    .error-msg::before {
-      content: "⚠️";
     }
 
     .question-card.has-error .error-msg {
@@ -208,119 +264,125 @@
     }
 
     .question-card.has-error .input-text,
+    .question-card.has-error .input-date,
     .question-card.has-error .time-select {
       border-color: var(--error-color);
     }
 
-    /* Time Picker UI (手機友善雙選單滾輪與快捷操作) */
+    /* Time Picker UI (Clean Flat Selects + Minimal Shortcut) */
     .time-picker-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
     }
 
     .time-select-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
     }
 
     .time-select-box {
       flex: 1;
       position: relative;
+      min-width: 0;
     }
 
     .time-select {
       width: 100%;
-      background: var(--input-bg);
+      height: 46px;
+      background-color: var(--input-bg);
       border: 1px solid var(--input-border);
       outline: none;
-      padding: 14px 16px;
-      border-radius: 14px;
+      padding: 10px 32px 10px 14px;
+      border-radius: 8px;
       color: var(--text-main);
       font-family: inherit;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-align: center;
+      font-size: 16px;
+      font-weight: 400;
+      text-align: left;
       cursor: pointer;
       appearance: none;
       -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23aaa5c0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238291A5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-size: 14px;
-      transition: all 0.25s ease;
-    }
-
-    .time-select:focus {
-      border-color: var(--primary-yellow);
-      box-shadow: 0 0 0 3px var(--input-focus);
+      background-position: right 12px center;
+      background-size: 12px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .time-select option {
-      background: #181330;
-      color: #fff;
-      font-size: 1rem;
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-size: 16px;
     }
 
     .time-separator {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-yellow);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-label);
       user-select: none;
-      margin: 0 2px;
     }
 
-    .time-actions-row {
+    .time-actions-row,
+    .date-actions-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 8px;
+      width: 100%;
     }
 
-    .btn-time-shortcut {
-      background: rgba(255, 213, 79, 0.12);
-      border: 1px solid rgba(255, 213, 79, 0.35);
-      color: var(--primary-yellow);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .btn-time-shortcut,
+    .btn-date-shortcut {
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      color: #4B5563;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 4px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
     }
 
-    .btn-time-shortcut:active {
-      transform: scale(0.96);
-      background: rgba(255, 213, 79, 0.25);
+    .btn-time-shortcut:hover,
+    .btn-date-shortcut:hover {
+      background: #E5E7EB;
     }
 
-    .time-selected-display {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      font-weight: 500;
+    .btn-time-shortcut:active,
+    .btn-date-shortcut:active {
+      background: #D1D5DB;
     }
 
-    .time-selected-display .highlight {
-      color: var(--primary-yellow);
-      font-weight: 700;
+    .time-selected-display,
+    .date-selected-display {
+      font-size: 12.5px;
+      color: var(--text-label);
+      font-weight: 400;
     }
 
-    /* Date Picker UI (防溢出、深色原生適配與快捷操作) */
+    .time-selected-display .highlight,
+    .date-selected-display .highlight {
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+
+    /* Date Picker UI (Clean Flat Input + Minimal Shortcut) */
     .date-picker-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
       max-width: 100%;
       min-width: 0;
-      box-sizing: border-box;
     }
 
     .date-input-container {
@@ -328,53 +390,31 @@
       width: 100%;
       max-width: 100%;
       min-width: 0;
-      box-sizing: border-box;
     }
 
     .input-date {
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
       display: block;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      outline: none;
-      padding: 13px 16px;
-      border-radius: 14px;
-      color: var(--text-main);
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 500;
-      color-scheme: dark; /* 強制原生日期選取器為深色模式，根除白色背景與溢出 */
+      color-scheme: light;
       -webkit-appearance: none;
       appearance: none;
-      transition: all 0.25s ease;
       cursor: pointer;
-    }
-
-    .input-date:focus {
-      border-color: var(--primary-yellow);
-      box-shadow: 0 0 0 3px var(--input-focus);
     }
 
     .input-date::-webkit-calendar-picker-indicator {
-      filter: invert(1);
       cursor: pointer;
-      opacity: 0.85;
+      opacity: 0.65;
       padding: 4px;
-      margin-left: 8px;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      margin-left: 6px;
+      transition: opacity 0.2s ease;
     }
 
     .input-date::-webkit-calendar-picker-indicator:hover {
       opacity: 1;
-      transform: scale(1.1);
     }
 
     .input-date::-webkit-date-and-time-value {
       text-align: left;
-      min-height: 1.5em;
+      min-height: 1.4em;
       color: var(--text-main);
     }
 
@@ -388,92 +428,58 @@
       background: transparent;
     }
 
-    .date-actions-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      width: 100%;
-      max-width: 100%;
+    /* Bottom Action Footer & Green Submit Button */
+    .submit-footer {
+      position: sticky;
+      bottom: 0;
+      background: inherit;
+      border-top: 1px solid #F1F5F9;
+      padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+      margin-top: 8px;
+      z-index: 10;
     }
 
-    .btn-date-shortcut {
-      background: rgba(255, 213, 79, 0.12);
-      border: 1px solid rgba(255, 213, 79, 0.35);
-      color: var(--primary-yellow);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-date-shortcut:active {
-      transform: scale(0.96);
-      background: rgba(255, 213, 79, 0.25);
-    }
-
-    .date-selected-display {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .date-selected-display .highlight {
-      color: var(--primary-yellow);
-      font-weight: 700;
-    }
-
-    /* Submit Button */
     .btn-submit {
       width: 100%;
-      background: var(--primary-yellow);
-      color: var(--btn-text, #0f0c20);
+      height: 48px;
+      background: var(--primary-green);
+      color: #FFFFFF;
       border: none;
       outline: none;
-      padding: 15px;
-      border-radius: 14px;
-      font-size: 1.05rem;
-      font-weight: 700;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 213, 79, 0.25);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.2s ease, opacity 0.2s ease;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn-submit:hover:not(:disabled) {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 213, 79, 0.35);
+      background: var(--primary-green-hover);
     }
 
     .btn-submit:active:not(:disabled) {
-      transform: translateY(0);
+      background: #049f43;
     }
 
     .btn-submit:disabled {
-      background: #444054;
-      color: #77728c;
+      background: #D1D5DB;
+      color: #6B7280;
       cursor: not-allowed;
-      box-shadow: none;
     }
 
     /* Spinner */
     .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(15, 12, 32, 0.1);
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.35);
       border-radius: 50%;
-      border-top-color: var(--btn-text, #0f0c20);
-      animation: spin 1s linear infinite;
+      border-top-color: #FFFFFF;
+      animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
@@ -482,28 +488,28 @@
       }
     }
 
-    /* Loading / Success Screen */
+    /* Loading / Error / Success State Screen */
     .state-screen {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 40px 10px;
+      padding: 56px 24px;
+      flex: 1;
     }
 
     .state-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 3.2rem;
+      margin-bottom: 16px;
+      animation: pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     @keyframes pop {
       0% {
-        transform: scale(0.5);
+        transform: scale(0.6);
         opacity: 0;
       }
-
       100% {
         transform: scale(1);
         opacity: 1;
@@ -511,40 +517,42 @@
     }
 
     .state-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-main);
     }
 
     .state-desc {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       line-height: 1.6;
     }
 
-    /* Config Panel Trigger (Hidden / Cog Icon) */
+    /* Config Panel Trigger (Subtle Cog Icon) */
     .config-trigger {
       position: absolute;
-      top: -10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      width: 32px;
-      height: 32px;
+      top: 12px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      opacity: 0.3;
-      transition: opacity 0.2s ease, background 0.2s ease;
-      color: #fff;
+      opacity: 0.18;
+      transition: opacity 0.2s ease, background-color 0.2s ease;
+      color: var(--text-main);
+      font-size: 14px;
+      z-index: 20;
     }
 
     .config-trigger:hover {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.15);
+      opacity: 0.85;
+      background: #F3F4F6;
     }
 
     /* Config Modal */
@@ -554,13 +562,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #181528;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
+      background: #FFFFFF;
+      border: 1px solid var(--divider-color);
+      border-radius: 12px;
       padding: 20px;
       width: 90%;
-      max-width: 400px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      max-width: 380px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
       z-index: 1000;
     }
 
@@ -571,38 +579,44 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
+      background: rgba(15, 23, 42, 0.45);
       z-index: 999;
     }
 
     .config-modal h3 {
-      margin-bottom: 15px;
-      color: #fff;
+      margin-bottom: 14px;
+      font-size: 1rem;
+      color: var(--text-main);
     }
 
     .config-modal label {
       display: block;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 13px;
+      color: var(--text-label);
       margin-bottom: 6px;
     }
 
     .config-modal input {
       width: 100%;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 44px;
+      padding: 10px 12px;
+      background: #FFFFFF;
+      border: 1px solid var(--input-border);
       border-radius: 8px;
-      color: #fff;
-      margin-bottom: 15px;
+      color: var(--text-main);
+      font-size: 15px;
+      margin-bottom: 16px;
       outline: none;
+    }
+
+    .config-modal input:focus {
+      border-color: var(--primary-green);
     }
 
     .config-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
     }
 
     .config-btn {
@@ -610,51 +624,54 @@
       border-radius: 8px;
       border: none;
       cursor: pointer;
+      font-size: 14px;
       font-weight: 600;
     }
 
     .config-btn-save {
-      background: var(--primary-yellow);
-      color: var(--btn-text, #0f0c20);
+      background: var(--primary-green);
+      color: #FFFFFF;
     }
 
     .config-btn-close {
-      background: #333;
-      color: #ccc;
+      background: #F3F4F6;
+      color: #4B5563;
     }
 
     /* Skeleton Loading */
+    .skeleton-wrap {
+      padding: 20px;
+    }
+
     .skeleton {
-      animation: skeleton-loading 1.5s linear infinite alternate;
+      animation: skeleton-loading 1.2s ease-in-out infinite alternate;
+      border-radius: 6px;
     }
 
     @keyframes skeleton-loading {
       0% {
-        background-color: rgba(255, 255, 255, 0.02);
+        background-color: #F3F4F6;
       }
-
       100% {
-        background-color: rgba(255, 255, 255, 0.08);
+        background-color: #E5E7EB;
       }
     }
 
     .skeleton-line {
-      height: 16px;
-      margin-bottom: 12px;
-      border-radius: 4px;
+      height: 14px;
+      margin-bottom: 8px;
     }
 
     .skeleton-title {
-      height: 28px;
-      width: 60%;
-      margin-bottom: 20px;
-      border-radius: 6px;
+      height: 22px;
+      width: 45%;
+      margin: 0 auto 20px;
     }
 
     .skeleton-box {
-      height: 48px;
-      border-radius: 12px;
-      margin-top: 10px;
+      height: 46px;
+      border-radius: 8px;
+      margin-bottom: 18px;
     }
   </style>
 </head>
@@ -670,20 +687,13 @@
     <div id="app-content">
 
       <!-- Skeleton Screen while loading -->
-      <div class="card skeleton">
+      <div class="skeleton-wrap">
         <div class="skeleton-title skeleton"></div>
-        <div class="skeleton-line skeleton" style="width: 100%"></div>
-        <div class="skeleton-line skeleton" style="width: 90%"></div>
-        <div class="skeleton-line skeleton" style="width: 40%"></div>
-      </div>
-
-      <div class="card skeleton">
         <div class="skeleton-line skeleton" style="width: 30%"></div>
         <div class="skeleton-box skeleton"></div>
-      </div>
-
-      <div class="card skeleton">
-        <div class="skeleton-line skeleton" style="width: 40%"></div>
+        <div class="skeleton-line skeleton" style="width: 35%"></div>
+        <div class="skeleton-box skeleton"></div>
+        <div class="skeleton-line skeleton" style="width: 25%"></div>
         <div class="skeleton-box skeleton"></div>
       </div>
 
@@ -704,7 +714,7 @@
   </div>
 
   <script>
-    // 預設後端位址 (如果您已知道 API 位址，可以直接寫在這裡，例如 'https://api.yourdomain.com')
+    // 預設後端位址
     let DEFAULT_BACKEND_ORIGIN = 'https://yoho-yzu-02850bb3d837.herokuapp.com';
 
     // 解析網址參數 (支援 LINE 的 liff.state 機制)
@@ -712,7 +722,6 @@
     if (searchParams.has('liff.state')) {
       const state = searchParams.get('liff.state');
       const stateParams = new URLSearchParams(state.startsWith('?') ? state : '?' + state);
-      // 將 state 中的參數合併進去
       for (const [key, value] of stateParams.entries()) {
         searchParams.set(key, value);
       }
@@ -760,21 +769,18 @@
         backendOrigin = val;
         toggleConfig(false);
         alert('設定已儲存，網頁將自動重新載入。');
-        
       }
     }
 
     // 檢測是否為電腦版環境 (桌面電腦/PC 瀏覽器，非手機 LINE)
     function isDesktopBrowser() {
-      // 1. 如果在 LINE App 內開啟，必定是手機客戶端
       if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) {
         return false;
       }
-      // 2. 檢測 User-Agent 是否為行動裝置 (手機/平板)
       const ua = navigator.userAgent || navigator.vendor || window.opera || '';
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
       if (!isMobile) {
-        return true; // 桌面電腦 / PC 瀏覽器
+        return true;
       }
       return false;
     }
@@ -782,14 +788,14 @@
     // 顯示電腦版專屬提示畫面
     function showDesktopBlockScreen() {
       document.getElementById('app-content').innerHTML = `
-        <div class="card state-screen" style="text-align: center; padding: 40px 20px;">
-          <div class="state-icon" style="font-size: 3.5rem; margin-bottom: 16px;">📱</div>
-          <div class="state-title" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #fff;">請使用LINE開啟此連結</div>
-          <div class="state-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">
+        <div class="state-screen">
+          <div class="state-icon">📱</div>
+          <div class="state-title">請使用 LINE 開啟此連結</div>
+          <div class="state-desc" style="margin-bottom: 24px;">
             此問卷為 LINE 行動專屬頁面，請以手機點擊或複製連結於 LINE 中開啟。
           </div>
-          <button type="button" class="btn-time-shortcut" style="padding: 10px 24px; font-size: 0.95rem; cursor: pointer; border-radius: 24px; display: inline-flex; align-items: center; gap: 8px;" onclick="copyCurrentUrl()">
-            📋 複製問卷連結
+          <button type="button" class="btn-submit" style="max-width: 220px;" onclick="copyCurrentUrl()">
+            複製問卷連結
           </button>
         </div>
       `;
@@ -804,9 +810,9 @@
             icon: 'success',
             title: '已複製連結',
             text: '請在手機 LINE 聊天室中貼上並開啟此連結。',
-            background: '#181528',
-            color: '#fff',
-            confirmButtonColor: '#ffd54f'
+            background: '#FFFFFF',
+            color: '#1F2937',
+            confirmButtonColor: '#06C755'
           });
         }).catch(() => {
           prompt('請手動複製以下連結：', url);
@@ -822,16 +828,15 @@
           icon: 'success',
           title: '已複製連結',
           text: '請在手機 LINE 聊天室中貼上並開啟此連結。',
-          background: '#181528',
-          color: '#fff',
-          confirmButtonColor: '#ffd54f'
+          background: '#FFFFFF',
+          color: '#1F2937',
+          confirmButtonColor: '#06C755'
         });
       }
     }
 
     // 初始化 App
     window.onload = async () => {
-      // 優先攔截電腦版環境
       if (isDesktopBrowser()) {
         showDesktopBlockScreen();
         return;
@@ -843,13 +848,8 @@
       }
 
       try {
-        // 1. 初始化 LIFF SDK
         await initializeLiff();
-
-        // 2. 獲取問卷詳情
         await fetchSurveyDetail();
-
-        // 3. 渲染問卷
         renderSurvey();
       } catch (err) {
         console.error(err);
@@ -867,23 +867,20 @@
 
     // 初始化 LIFF
     async function initializeLiff() {
-      const liffId = '2009851813-eNpc9OUb'; // 統一使用預設的 LIFF ID
+      const liffId = '2009851813-eNpc9OUb';
       try {
-        // 第一步：優先初始化 LIFF，避免 LINE App 逾時自動關閉視窗
         await liff.init({ liffId: liffId });
 
         if (liff.isLoggedIn()) {
           liffProfile = await liff.getProfile();
           liffIdToken = liff.getIDToken();
         } else {
-          // 若在 LINE App 以外開啟，引導進行登入
           if (!liff.isInClient()) {
             liff.login();
           }
         }
       } catch (e) {
         console.warn('LIFF init failed:', e);
-        // 如果是在一般瀏覽器中（非 LINE Client）且初始化失敗，提供模擬資料供測試
         if (!liff.isInClient || !liff.isInClient()) {
           liffProfile = {
             userId: 'U' + Math.random().toString(36).substring(2, 15),
@@ -891,62 +888,34 @@
             pictureUrl: ''
           };
         } else {
-          // 如果在 LINE App 內初始化失敗，向上拋出錯誤以利顯示錯誤畫面
           throw new Error('LINE LIFF 初始化失敗: ' + (e.message || e.toString()));
         }
       }
     }
 
-    // 重新拉取詳情
+    // 拉取問卷詳情並套用背景設定
     async function fetchSurveyDetail() {
       try {
         const res = await axios.get(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}?oaId=${oaId}`);
         surveyData = res.data.survey;
-        
+
+        // 保留背景圖片自由設定能力，表單容器維持高可讀性白底
         if (surveyData.bg_image) {
           document.body.style.backgroundImage = `url('${surveyData.bg_image}')`;
           document.body.style.backgroundSize = 'cover';
           document.body.style.backgroundPosition = 'center';
           document.body.style.backgroundAttachment = 'fixed';
+          document.body.classList.add('has-custom-bg');
         } else {
           document.body.style.backgroundImage = '';
-        }
-
-        if (surveyData.theme_color) {
-          const color = surveyData.theme_color;
-          if (/^#[0-9a-fA-F]{6}$/.test(color)) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-            
-            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-            const isLight = luminance > 0.6;
-            
-            document.documentElement.style.setProperty('--bg-gradient', color);
-            
-            if (isLight) {
-              document.documentElement.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.6)');
-              document.documentElement.style.setProperty('--card-border', 'rgba(0, 0, 0, 0.1)');
-              document.documentElement.style.setProperty('--text-main', '#1a1a1a');
-              document.documentElement.style.setProperty('--text-muted', '#4a4a4a');
-              document.documentElement.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.8)');
-              document.documentElement.style.setProperty('--input-border', 'rgba(0, 0, 0, 0.2)');
-              document.documentElement.style.setProperty('--primary-yellow', '#1a1a1a');
-              document.documentElement.style.setProperty('--primary-hover', '#333333');
-              document.documentElement.style.setProperty('--btn-text', '#ffffff');
-            } else {
-              document.documentElement.style.setProperty('--card-bg', 'rgba(0, 0, 0, 0.45)');
-              document.documentElement.style.setProperty('--card-border', 'rgba(255, 255, 255, 0.15)');
-              document.documentElement.style.setProperty('--text-main', '#ffffff');
-              document.documentElement.style.setProperty('--text-muted', '#cccccc');
-              document.documentElement.style.setProperty('--input-bg', 'rgba(0, 0, 0, 0.4)');
-              document.documentElement.style.setProperty('--input-border', 'rgba(255, 255, 255, 0.2)');
-              document.documentElement.style.setProperty('--primary-yellow', '#ffffff');
-              document.documentElement.style.setProperty('--primary-hover', '#eeeeee');
-              document.documentElement.style.setProperty('--btn-text', '#000000');
-            }
+          const color = (surveyData.theme_color || '').trim();
+          // 未上傳背景圖時：若設定了非舊預設值 (#FFD700) 且非純白的主題色，作為外圍底色；否則預設純淨白底
+          if (/^#[0-9a-fA-F]{6}$/.test(color) && !['#FFD700', '#FFFFFF', '#F8FAFC'].includes(color.toUpperCase())) {
+            document.documentElement.style.setProperty('--page-bg', color);
+            document.body.classList.add('has-custom-bg');
           } else {
-            document.documentElement.style.setProperty('--primary-yellow', color);
+            document.documentElement.style.setProperty('--page-bg', '#FFFFFF');
+            document.body.classList.remove('has-custom-bg');
           }
         }
       } catch (err) {
@@ -958,7 +927,7 @@
     // 顯示錯誤畫面
     function showErrorScreen(title, desc) {
       document.getElementById('app-content').innerHTML = `
-        <div class="card state-screen">
+        <div class="state-screen">
           <div class="state-icon" style="color: var(--error-color)">❌</div>
           <div class="state-title">${title}</div>
           <div class="state-desc">${desc}</div>
@@ -969,8 +938,8 @@
     // 顯示友善狀態畫面
     function showFriendlyScreen(title, desc, icon = '⏳') {
       document.getElementById('app-content').innerHTML = `
-        <div class="card state-screen">
-          <div class="state-icon" style="color: var(--primary-yellow)">${icon}</div>
+        <div class="state-screen">
+          <div class="state-icon">${icon}</div>
           <div class="state-title">${title}</div>
           <div class="state-desc">${desc}</div>
         </div>
@@ -980,36 +949,36 @@
     // 顯示成功畫面
     function showSuccessScreen(msg) {
       document.getElementById('app-content').innerHTML = `
-        <div class="card state-screen">
-          <div class="state-icon" style="color: var(--success-color)">✨</div>
+        <div class="state-screen">
+          <div class="state-icon" style="color: var(--success-color)">✅</div>
           <div class="state-title">提交成功</div>
           <div class="state-desc" style="white-space: pre-wrap;">${msg}</div>
         </div>
       `;
     }
 
-    // 渲染問卷畫面
+    // 渲染問卷畫面 (Minimal Clean Form UI)
     function renderSurvey() {
       if (!surveyData) return;
 
       let html = `
-        <div class="card survey-header">
+        <div class="survey-header">
           <h1>${escapeHtml(surveyData.title)}</h1>
           ${surveyData.description ? `<p>${escapeHtml(surveyData.description)}</p>` : ''}
         </div>
         
         <form id="survey-form" onsubmit="submitForm(event)">
+          <div class="questions-list">
       `;
 
-      surveyData.questions.forEach((q, index) => {
+      surveyData.questions.forEach((q) => {
         const isRequired = q.required;
         const qId = q.id;
 
         html += `
-          <div class="card question-card" id="q-card-${qId}">
+          <div class="question-card" id="q-card-${qId}">
             <div class="question-label">
-              ${index + 1}. ${escapeHtml(q.content)}
-              ${isRequired ? '<span class="required-star">*</span>' : ''}
+              ${escapeHtml(q.content)}${isRequired ? '<span class="required-star">*</span>' : ''}
             </div>
             <div class="input-area">
         `;
@@ -1035,7 +1004,7 @@
               </div>
               <div class="date-actions-row">
                 <button type="button" class="btn-date-shortcut" onclick="fillTodayDate('${qId}')">
-                  📅 填入今天日期
+                  填入今天日期
                 </button>
                 <div class="date-selected-display" id="date-display-${qId}">
                   尚未選取日期
@@ -1045,17 +1014,15 @@
           `;
         }
         else if (q.answer_type === 'time') {
-          // 生成小時選項 (00 ~ 23)
-          let hourOptions = '<option value="">時 (小時)</option>';
+          let hourOptions = '<option value="">時</option>';
           for (let h = 0; h < 24; h++) {
             const hStr = String(h).padStart(2, '0');
-            hourOptions += `<option value="${hStr}">${hStr} 時</option>`;
+            hourOptions += `<option value="${hStr}">${hStr}</option>`;
           }
-          // 生成分鐘選項 (00 ~ 59)
-          let minOptions = '<option value="">分 (分鐘)</option>';
+          let minOptions = '<option value="">分</option>';
           for (let m = 0; m < 60; m++) {
             const mStr = String(m).padStart(2, '0');
-            minOptions += `<option value="${mStr}">${mStr} 分</option>`;
+            minOptions += `<option value="${mStr}">${mStr}</option>`;
           }
 
           html += `
@@ -1075,7 +1042,7 @@
               </div>
               <div class="time-actions-row">
                 <button type="button" class="btn-time-shortcut" onclick="setTimeToNow('${qId}')">
-                  ⏱️ 填入現在時間
+                  填入現在時間
                 </button>
                 <span class="time-selected-display" id="time-disp-${qId}">
                   尚未選取
@@ -1086,10 +1053,9 @@
           `;
         }
         else if (q.answer_type === 'single_choice') {
-          // 單選題
           const options = parseOptions(q.options);
           html += `<div class="option-group">`;
-          options.forEach((opt, optIdx) => {
+          options.forEach((opt) => {
             html += `
               <label class="option-item">
                 <input type="radio" name="q-${qId}" value="${escapeHtml(opt)}" data-qid="${qId}" data-required="${isRequired}">
@@ -1100,10 +1066,9 @@
           html += `</div>`;
         }
         else if (q.answer_type === 'multiple_choice') {
-          // 複選題
           const options = parseOptions(q.options);
           html += `<div class="option-group">`;
-          options.forEach((opt, optIdx) => {
+          options.forEach((opt) => {
             html += `
               <label class="option-item">
                 <input type="checkbox" name="q-${qId}" value="${escapeHtml(opt)}" data-qid="${qId}" data-required="${isRequired}">
@@ -1122,7 +1087,10 @@
       });
 
       html += `
-          <button type="submit" class="btn-submit" id="btn-submit">提交問卷</button>
+          </div>
+          <div class="submit-footer">
+            <button type="submit" class="btn-submit" id="btn-submit">提交問卷</button>
+          </div>
         </form>
       `;
 
@@ -1175,6 +1143,8 @@
       if (!input || !display) return;
       const val = (input.value || '').trim();
       if (val) {
+        const card = document.getElementById(`q-card-${qId}`);
+        if (card) card.classList.remove('has-error');
         try {
           const parts = val.split('-');
           if (parts.length === 3) {
@@ -1304,7 +1274,6 @@
       });
 
       if (hasError) {
-        // 滾動到第一個錯誤的題目
         const firstError = document.querySelector('.question-card.has-error');
         if (firstError) {
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1323,16 +1292,13 @@
       };
 
       try {
-        // 鎖定按鈕並顯示載入中
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<div class="spinner"></div> 提交中...`;
 
         const res = await axios.post(`${backendOrigin}/api/liff-questionnaires/public/${surveyId}/responses?oaId=${oaId}${groupId ? '&groupId=' + encodeURIComponent(groupId) : ''}`, payload);
 
-        // 顯示成功頁面
         showSuccessScreen(res.data.finish_message || '感謝您的填寫！');
 
-        // 延遲關閉視窗 (LIFF 特有)
         setTimeout(() => {
           if (liff && liff.closeWindow) {
             liff.closeWindow();
@@ -1354,7 +1320,7 @@
             if (qCard) qCard.classList.add('has-error');
             if (errorEl) {
               errorEl.innerText = reason;
-              errorEl.style.display = 'block';
+              errorEl.style.display = 'flex';
             }
           });
           const firstErrCard = document.querySelector('.question-card.has-error');

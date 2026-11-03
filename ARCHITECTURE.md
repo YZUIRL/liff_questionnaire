@@ -19,3 +19,17 @@
 
 ## [2026-11-03] 動態群組參數 `<%m.groupid%>` 合法性過濾
 - 於 `index.html` 解析 `groupId` 時加入 `/^[CR][0-9a-fA-F]{10,}$/` 格式驗證，當網址由個人對話觸發（`groupId=None`）或未經機器人替換（`groupId=<%m.groupid%>`）時自動轉為空字串 `''`，確保同一條問卷連結可跨群組與個人對話通用。
+
+
+## [2026-11-03] LIFF 表單 UI 風格統一與視覺重構（Minimal Clean Form UI）
+
+### 1. 視覺重構與設計原則
+- **Minimal Clean Form UI / Mobile-first 扁平化表單**：
+  - 移除每道題目外圍獨立的深色半透明毛玻璃卡片（Glassmorphism）、漸層與過度陰影，改為統一的高可讀性白色主要表單容器（`#FFFFFF` / `rgba(255, 255, 255, 0.96)`）。
+  - **保留自訂背景圖片 (`bg_image`) 與外圍底色 (`theme_color`)**：當問卷有設定 `bg_image` 或非白色 `theme_color` 時，`body` 維持顯示背景圖片（`cover` / `center` / `fixed`）或外圍底色，而中間表單容器保持白底與圓角邊框，確保深色、淺色或高對比背景圖片下表單文字皆清晰易讀。
+- **表單元件統一樣式**：
+  - **Label（欄位標籤）**：移除自動題號（`1.`、`2.`），統一使用 `13.5px`、`#8291A5`、與輸入框間距 `7px`，欄位區塊間距 `18px`，必填星號為 `#EF4444`。
+  - **Input / Textarea / Date / Time Select**：統一為白底 `#FFFFFF`、細灰邊框 `1px solid #D9DEE5`、圓角 `8px`、單行高度 `46px`、內距 `11px 14px`、字體 `16px`（防止手機瀏覽器點擊自動放大）、文字色 `#1F2937`、Placeholder `#9CA3AF`；Focus 邊框與光暈採用 LINE 綠色 `#06C755`。
+  - **日期與時間快捷列**：保留「填入今天日期」與「填入現在時間」快捷按鈕，改為極簡淺灰小按鈕樣式（`#F3F4F6` 底、`#E5E7EB` 框、`12.5px`）。
+  - **Radio / Checkbox**：移除大型半透明選項框，改為左靠齊圓形 Radio / 方形 Checkbox 清單，選取識別色統一為 `#06C755`。
+  - **主要操作按鈕 (`.btn-submit`)**：固定為 LINE 綠色 `#06C755`、白字 `#FFFFFF`、圓角 `8px`、高度 `48px`、字重 `600`，搭配底部 Sticky 區塊與 `env(safe-area-inset-bottom)` 手機安全區域內距。
